@@ -1,13 +1,9 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
-```{r,}
+
+```r
 if(!file.exists("activity.csv")) {
 unzip("activity.zip")}
 activity <- read.csv("activity.csv")
@@ -16,7 +12,8 @@ activity <- read.csv("activity.csv")
 
 
 ## What is mean total number of steps taken per day?
-```{r,}
+
+```r
 dates <- levels(activity$date)
 TotalsByDate <- vector("numeric")
 for(i in dates) {
@@ -24,12 +21,17 @@ TotalsByDate <- c(TotalsByDate,sum(activity[activity$date==i,1]))
 }
 hist(TotalsByDate, main="Histogram of Total Daily Steps", xlab="Total Daily Steps", breaks=8, col="red")
 text(3000, 15, labels=c(paste("Mean=",as.integer(mean(TotalsByDate, na.rm=T)), paste("\nMedian=", as.integer(median(TotalsByDate, na.rm=T))))))
-rm(i)
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
+```r
+rm(i)
 ```
 
 ## What is the average daily activity pattern?
-```{r,}
+
+```r
 intervals <- unique(activity$interval)
 AvesByIntv <- vector("integer")
 for(i in intervals) {
@@ -40,14 +42,31 @@ main="Average Steps by 5min Interval",
 xlab="5min Interval",
 ylab="Mean No. Steps (Ave. across all days)")
 text(1140, 200, paste("<< Max @", intervals[which(AvesByIntv==max(AvesByIntv))], "min,\n","(", as.integer(max(AvesByIntv)), "steps)"))
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
+```r
 rm(i)
 activityCP <- activity
 print(paste("There are",sum(complete.cases(activity)),"complete observations in the dataset."))
+```
+
+```
+## [1] "There are 15264 complete observations in the dataset."
+```
+
+```r
 print(paste("There are",sum(!complete.cases(activity)),"rows containing NAs."))
 ```
 
+```
+## [1] "There are 2304 rows containing NAs."
+```
+
 ## Imputing missing values
-```{r,} 
+
+```r
 #replace NAs in activity$steps with respective interval means
 activityCP <- activity
 NAindx <- which(is.na(activity$steps))
@@ -62,16 +81,40 @@ rplTotalsByDate <- c(rplTotalsByDate,sum(activity[activity$date==i,1]))
 }
 hist(TotalsByDate, main="Histogram of Total Daily Steps", xlab="Total Daily Steps", breaks=8, col="red")
 text(3000, 30, labels=c(paste("Mean=",as.integer(mean(rplTotalsByDate, na.rm=T)), paste("\nMedian=", as.integer(median(rplTotalsByDate, na.rm=T))))))
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
+```r
 rm(i)
 rm(activityCP)
 print(paste("There are",sum(complete.cases(activity)),"complete observations in the dataset."))
+```
+
+```
+## [1] "There are 15264 complete observations in the dataset."
+```
+
+```r
 print(paste("There are",sum(!complete.cases(activity)),"rows containing NAs."))
+```
+
+```
+## [1] "There are 2304 rows containing NAs."
 ```
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r , }
+
+```r
 if(!require(lattice)) {install.packages("lattice")}
+```
+
+```
+## Loading required package: lattice
+```
+
+```r
 library(lattice)
 actV <- activity
 actV <- transform(actV, wDays=weekdays(as.Date(actV$date)), Type=vector("character", length=length(actV$date)))
@@ -93,3 +136,5 @@ IntAvesE <- data.frame(intervals, ave.steps=IntvAvesWE, day=mtwrf)
 tmp <- as.data.frame(rbind(IntAvesD,IntAvesE))
 xyplot(ave.steps~intervals|day, data=tmp, type="l", main="Average Steps by Interval,\nAveraged Across All Days")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
